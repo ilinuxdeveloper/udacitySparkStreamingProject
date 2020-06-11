@@ -1,9 +1,7 @@
-
-Write the answers to these questions in the README.md doc of your GitHub repo:
-
-How did changing values on the SparkSession property parameters affect the throughput and latency of the data?
-The changing of property Rate per partition and Offsets per trigger were experimented based on the lecture video.
-changing the value altered the report of processed rows per second metric.
+QHow did changing values on the SparkSession property parameters affect the throughput and latency of the data?
+A
+I tried to experiment canging  Rate per partition and Offsets per trigger based on the lecture video.
+I observed changing the value altered the report of processed rows per second metric.
 different value tried from none upto 20 and its ranged between 0.7 to 4.
 Attached the screenshots for different tries.
 
