@@ -42,7 +42,7 @@ def run_spark_job(spark):
         .option("kafka.bootstrap.servers","localhost:9092") \
         .option("subscribe","sfcrime") \
         .option("maxRatePerPartition",20) \
-        .option("maxOffsetsPerTrigger",20) \    
+        .option("maxOffsetsPerTrigger",20) \
         .option("startingOffsets", "earliest") \
         .option("stopGracefullyOnShutdown", "true") \
         .load()
@@ -61,11 +61,17 @@ def run_spark_job(spark):
     service_table.printSchema()
     
     # TODO select original_crime_type_name and disposition
-    distinct_table = service_table.select(["original_crime_type_name","disposition"])
+    #distinct_table = service_table.select(["original_crime_type_name","disposition"])
+    distinct_table = service_table.select([psf.to_timestamp(psf.col("call_date_time")).alias("original_crime_time"), "original_crime_type_name","disposition"])
+
     distinct_table.printSchema()    
+
     
     # count the number of original crime type
-    agg_df = distinct_table.groupBy(["original_crime_type_name","disposition"]).count()
+    #agg_df = distinct_table.groupBy(["original_crime_type_name","disposition"]).count()
+    # count the number of original crime type
+    agg_df = distinct_table.withWatermark("original_crime_time", "45 minutes") \
+                            .groupBy([psf.window("original_crime_time", "15 minutes", "8 minutes"),"original_crime_type_name","disposition"]).count()    
     #agg_df = distinct_table.count()
 
     # TODO Q1. Submit a screen shot of a batch ingestion of the aggregation
@@ -75,8 +81,8 @@ def run_spark_job(spark):
             .outputMode('Complete') \
             .format('console') \
             .option("truncate", "false") \
-            .start()
-
+            .start()  
+    
     # TODO attach a ProgressReporter
     query.awaitTermination()
 
