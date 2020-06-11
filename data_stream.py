@@ -41,12 +41,11 @@ def run_spark_job(spark):
         .format("kafka") \
         .option("kafka.bootstrap.servers","localhost:9092") \
         .option("subscribe","sfcrime") \
+        .option("maxRatePerPartition",20) \
+        .option("maxOffsetsPerTrigger",20) \    
         .option("startingOffsets", "earliest") \
         .option("stopGracefullyOnShutdown", "true") \
         .load()
-    
-        #.option("maxRatePerPartition",20) \
-        #.option("maxOffsetsPerTrigger",20) \
   
     # Show schema for the incoming resources for checks
     df.printSchema()
